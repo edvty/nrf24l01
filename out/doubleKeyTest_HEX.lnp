@@ -1,0 +1,6 @@
+".\out\MAIN.obj",
+".\out\nrf24l01p.obj",
+".\out\delay.obj",
+".\out\UART.obj" 
+TO ".\out\doubleKeyTest_HEX" 
+PRINT(".\doubleKeyTest_HEX.m51")

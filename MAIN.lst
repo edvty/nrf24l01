@@ -1,0 +1,126 @@
+C51 COMPILER V9.01   MAIN                                                                  05/04/2018 15:49:47 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\out\MAIN.obj
+COMPILER INVOKED BY: D:\keilc51\C51\BIN\C51.EXE source\MAIN.C ROM(SMALL) BROWSE INCDIR(.\inc) DEBUG OBJECTEXTEND PRINT(.
+                    -\MAIN.lst) OBJECT(.\out\MAIN.obj)
+
+line level    source
+
+   1          /******************************************************************************/
+   2          /*                        -- 深圳安信可科技有限公司 --                        */
+   3          /*
+   4          //  文件名：main.c                                                              
+   5          //  说明：供客户测试模块通信使用程序                                                                  
+   6          //  编写人员：                                                                   
+   7          //  编写日期：                                                              
+   8          //  程序维护：
+   9          //  维护记录：
+  10          //
+  11          //                                                          
+  12          */ 
+  13          // 免责声明：该程序仅用于学习与交流 
+  14          // (c) Anxinke Corporation. All rights reserved.                                                          
+             -     
+  15          /******************************************************************************/
+  16          #include "typedef.h"
+  17          #include "gpio.h"
+  18          #include "uart.h"
+  19          #include "nrf24l01p.h"
+  20          #include "delay.h"
+  21          
+  22          uchar txData[32] = {0x00};
+  23          uchar rxData[32] = {0x00};
+  24          
+  25          /******************************************************************************/
+  26          // 函数名称：main 
+  27          // 输入参数： 
+  28          // 输出参数： 
+  29          // 函数功能： 
+  30          /******************************************************************************/
+  31          void main(void)
+  32          {
+  33   1          unsigned char i=0;
+  34   1          uartInit();   
+  35   1          Delay100ms();
+  36   1          init_nrf24l01_io();
+  37   1          led1ON();
+  38   1          Delay100ms();
+  39   1          led1OFF();
+  40   1          Delay100ms();
+  41   1          led1ON();
+  42   1          Delay100ms();
+  43   1          led1OFF();
+  44   1          
+  45   1          Delay100ms();
+  46   1          uartSendString("System initialization is complete!\r\n");
+  47   1          receive_mode_init();
+  48   1          
+  49   1          while(1)
+  50   1          {
+  51   2              KEY1 = 1;
+  52   2              KEY2 = 1;
+  53   2              /*
+C51 COMPILER V9.01   MAIN                                                                  05/04/2018 15:49:47 PAGE 2   
+
+  54   2               * 判断是否按下KEY
+  55   2              */
+  56   2              if (key1ON() || key2ON()) {
+  57   3                  _delay_us(500);
+  58   3                  txData[0] = 0;
+  59   3                  if (key1ON()) {
+  60   4                      txData[0] = 0xAA; // 如果按下K1  则将数据置为0xAA  
+  61   4                      uartSendString("You press the left button\r\n"); 
+  62   4                  } else if (key2ON()){
+  63   4                      txData[0] = 0x55; // 如果按下K2  则将数据置为0x55
+  64   4                      uartSendString("You press the Right button\r\n");
+  65   4                  }
+  66   3                  /*
+  67   3                   * 根据不同的数据LED提示
+  68   3                  */
+  69   3                  if (send_data(txData) == 1) {
+  70   4                      uartSendString("Success of sending data\r\n");
+  71   4                      if (txData[0] == 0xAA) {
+  72   5                          led1ON();    
+  73   5                      } else if (txData[0] == 0x55) {
+  74   5                          led2ON(); 
+  75   5                      } 
+  76   4                      Delay100ms();   
+  77   4                      led1OFF();
+  78   4                      led2OFF(); 
+  79   4                  } else {
+  80   4                      uartSendString("Failed to send data\r\n");
+  81   4                  }      
+  82   3                  receive_mode_init();
+  83   3              }
+  84   2              rxData[0] = 0;
+  85   2              led1OFF();
+  86   2              led2OFF();
+  87   2              if (receive_data(rxData)) {
+  88   3                  if (rxData[0] == 0xAA) {
+  89   4                      led1ON();
+  90   4                      uartSendString("Receiving the data, from the Left\r\n");
+  91   4                  } else if (rxData[0] == 0x55) {
+  92   4                      led2ON();
+  93   4                      uartSendString("Receiving the data, from the Right\r\n");
+  94   4                  }
+  95   3                  Delay100ms();
+  96   3              }
+  97   2          
+  98   2          }
+  99   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    192    ----
+   CONSTANT SIZE    =    215    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     64       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
